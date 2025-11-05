@@ -299,6 +299,13 @@ const questions = [
         { thehuatahsaver7: +1 },
       ],
     },
+    // STORY 13 (Ending) - currentQuestionIndex = 24
+    {
+      question:
+        "You’ve just lived through 12 mini moments of your Singapore life story, from hawker queues to future dreams. Ready or not, every scene reveals a part of how you face life’s surprises, choices, and rewards.",
+      choices: ["→"],
+      weights: [{}],
+    },
   ];
 
 function startQuiz() {
