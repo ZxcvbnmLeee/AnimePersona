@@ -449,15 +449,6 @@ function calculateAndDisplayResult() {
     lobangking8,
   };
 
-  let topPersona = null;
-  let topScore = -Infinity;
-  for (const k in scores) {
-    if (scores[k] > topScore) {
-      topScore = scores[k];
-      topPersona = k;
-    }
-  }
-
   const personaMap = {
     thekiasuhero1: { image: "R1.png", type: "The Kiasu Hero" },
     theyoloexplorer2: { image: "R2.png", type: "The YOLO Explorer Wanderer" },
@@ -469,11 +460,34 @@ function calculateAndDisplayResult() {
     lobangking8: { image: "R8.png", type: "Lobang King" },
   };
 
-  const { image, type } = personaMap[topPersona] || {
-    image: "R1.png",
-    type: "The Kiasu Hero",
-  };
-  resultType = type;
+  /////////////////
+  // CALCULATION //
+  /////////////////
+  // Step 1: Sort scores descending
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  console.log("sorted:", sorted);
+  const [topPersona, topScore] = sorted[0];
+  const [secondPersona, secondScore] = sorted[1];
+
+  // Step 2: Determine if second is tied (or very close)
+  const isClose = secondScore === topScore; // You can loosen to Math.abs(topScore - secondScore) <= 1
+
+  // Step 3: Set up primary + secondary
+  const primary = personaMap[topPersona];
+  const secondary = isClose ? personaMap[secondPersona] : null;
+
+  // Step 4: Set result text
+  let resultText = primary.type;
+  if (secondary) {
+    resultText = `You’re mainly a "${primary.type}", with some "${secondary.type}" vibes.`;
+  }
+  resultType = primary.type;
+
+  //const { image, type } = personaMap[topPersona] || {
+  //  image: "R1.png",
+  //  type: "The Kiasu Hero",
+  //};
+  //resultType = type;
 
   if (!quizResultsSent) {
     sendQuizResults();
@@ -482,11 +496,20 @@ function calculateAndDisplayResult() {
 
   const resultImageDiv = document.getElementById("result-image");
   if (resultImageDiv) {
-    resultImageDiv.innerHTML = `<img src="./images/${image}" class="result-image" alt="Your Persona Result">`;
+    if (secondary) {
+      resultImageDiv.innerHTML = `
+        <div class="dual-result">
+          <img src="./images/${primary.image}" class="result-image" alt="${primary.type}">
+          <img src="./images/${secondary.image}" class="result-image secondary" alt="${secondary.type}">
+        </div>`;
+    } else {
+      resultImageDiv.innerHTML = `<img src="./images/${primary.image}" class="result-image" alt="Your Persona Result">`;
+    }
   }
 
   const resultTypeEl = document.getElementById("result-type");
-  if (resultTypeEl) resultTypeEl.textContent = resultType;
+  if (resultTypeEl) resultTypeEl.textContent = resultText;
+  //if (resultTypeEl) resultTypeEl.textContent = resultType;
 
   showPage("result-page");
 }
@@ -688,7 +711,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (shareButton) {
     shareButton.addEventListener("click", function () {
       const shareData = {
-        title: "AnimePersona",
+        title: "LifePersona",
         text: "I just found out my Persona! 🌟 Try it too!",
         url: window.location.href,
       };
